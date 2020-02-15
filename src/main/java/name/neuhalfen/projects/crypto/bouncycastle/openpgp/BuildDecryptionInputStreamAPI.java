@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchProviderException;
-import java.time.Instant;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.decrypting.DecryptionStreamFactory;
@@ -175,7 +174,7 @@ public final class BuildDecryptionInputStreamAPI {
 
     private static final boolean SELECT_UID_BY_E_MAIL_ONLY_DEFAULT = true;
     @Nullable
-    private Instant dateOfTimestampVerification;
+    private Long dateOfTimestampVerification;
     @Nullable
     private Boolean selectUidByEMailOnly;
     @Nullable
@@ -190,7 +189,7 @@ public final class BuildDecryptionInputStreamAPI {
     /**
      * <p>In order to determine key validity a reference point in time for "now" is needed.
      * The default value is "Instant.now()". If this needs to be overridden, pass the value
-     * here. To effectively disable time based key verification pass Instant.MAX (NOT recommended)
+     * here. To effectively disable time based key verification pass Long.MAX_VALUE (NOT recommended)
      * </p><p>
      * This is not possible in combination with #withKeySelectionStrategy.
      * </p>
@@ -200,7 +199,7 @@ public final class BuildDecryptionInputStreamAPI {
      * @return next step in build
      */
     @SuppressWarnings("PMD.LinguisticNaming")
-    public Validation setReferenceDateForKeyValidityTo(final Instant dateOfTimestampVerification) {
+    public Validation setReferenceDateForKeyValidityTo(final Long dateOfTimestampVerification) {
       Preconditions.checkState(keySelectionStrategy == null,
           "selectUidByAnyUidPart/setReferenceDateForKeyValidityTo cannot "
               + "be used together with 'withKeySelectionStrategy' ");
@@ -265,7 +264,7 @@ public final class BuildDecryptionInputStreamAPI {
           this.selectUidByEMailOnly = SELECT_UID_BY_E_MAIL_ONLY_DEFAULT;
         }
         if (this.dateOfTimestampVerification == null) {
-          this.dateOfTimestampVerification = Instant.now();
+          this.dateOfTimestampVerification = System.currentTimeMillis();
         }
 
         if (this.selectUidByEMailOnly) {

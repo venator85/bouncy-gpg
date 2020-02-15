@@ -16,7 +16,6 @@ import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
-import java.time.Instant;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -45,7 +44,7 @@ public class EncryptionScenariosTest {
         final OutputStream outputStream = BouncyGPG
                 .encryptToStream()
                 .withConfig(sendersKeyring)
-                .setReferenceDateForKeyValidityTo(Instant.MAX)
+                .setReferenceDateForKeyValidityTo(Long.MAX_VALUE)
                 .withAlgorithms(DefaultPGPAlgorithmSuites.strongSuite())
                 .toRecipient(ExampleMessages.ONLY_MASTER_KEY_UID)
                 .andDoNotSign()

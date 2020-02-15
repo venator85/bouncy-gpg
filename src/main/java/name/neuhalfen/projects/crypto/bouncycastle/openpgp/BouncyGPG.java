@@ -14,6 +14,14 @@ public final class BouncyGPG {
   private BouncyGPG() {
   }
 
+  public static BuildSigningOutputStreamAPI signToStream() {
+    return new BuildSigningOutputStreamAPI();
+  }
+
+  public static BuildVerificationInputStreamAPI verifyStream() {
+    return new BuildVerificationInputStreamAPI();
+  }
+
   /**
    * Entry point for stream based decryption.  Ultimately an encryption output stream is placed
    * before a user supplied output stream so that plaintext written to the encryption stream is

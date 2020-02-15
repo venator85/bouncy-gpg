@@ -6,7 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.time.Instant;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.algorithms.DefaultPGPAlgorithmSuites;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.callbacks.KeySelectionStrategy;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.keyrings.KeyringConfig;
@@ -83,7 +82,7 @@ public class BuildEncryptionOutputStreamAPITest {
   public void keySelectionStrategy_SelectUidByAnyUidPart_compatible_with_setReferenceDateForKeyValidityTo()
       throws Exception {
     BouncyGPG.encryptToStream().withConfig(mockKeyringConfig()).selectUidByAnyUidPart()
-        .setReferenceDateForKeyValidityTo(Instant.MAX).withDefaultAlgorithms();
+        .setReferenceDateForKeyValidityTo(Long.MAX_VALUE).withDefaultAlgorithms();
   }
 
   private KeySelectionStrategy mockKeySelectionStrategy() {

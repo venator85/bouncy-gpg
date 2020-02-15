@@ -1,7 +1,6 @@
 package name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.callbacks;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -23,7 +22,7 @@ public class ByEMailKeySelectionStrategy extends Rfc4880KeySelectionStrategy imp
   /**
    * @param dateOfTimestampVerification The date used for key expiration date checks as "now".
    */
-  public ByEMailKeySelectionStrategy(final Instant dateOfTimestampVerification) {
+  public ByEMailKeySelectionStrategy(final Long dateOfTimestampVerification) {
     super(dateOfTimestampVerification, true, true);
   }
 

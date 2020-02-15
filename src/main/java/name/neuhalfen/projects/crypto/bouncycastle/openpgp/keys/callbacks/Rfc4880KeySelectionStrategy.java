@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 import static name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.generation.KeyFlag.extractPublicKeyFlags;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -29,7 +28,7 @@ public class Rfc4880KeySelectionStrategy implements KeySelectionStrategy {
   private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory
       .getLogger(Rfc4880KeySelectionStrategy.class);
 
-  private final Instant dateOfTimestampVerification;
+  private final Long dateOfTimestampVerification;
   private final boolean ignoreCase;
   private final boolean matchPartial;
 
@@ -38,7 +37,7 @@ public class Rfc4880KeySelectionStrategy implements KeySelectionStrategy {
    *
    * @param dateOfTimestampVerification The date used for key expiration date checks as "now".
    */
-  public Rfc4880KeySelectionStrategy(final Instant dateOfTimestampVerification) {
+  public Rfc4880KeySelectionStrategy(final Long dateOfTimestampVerification) {
     this(dateOfTimestampVerification, true, true);
   }
 
@@ -51,7 +50,7 @@ public class Rfc4880KeySelectionStrategy implements KeySelectionStrategy {
    * @param ignoreCase if true case is ignored in user ID comparisons.
    * @param dateOfTimestampVerification The date used for key expiration date checks as "now".
    */
-  public Rfc4880KeySelectionStrategy(final Instant dateOfTimestampVerification,
+  public Rfc4880KeySelectionStrategy(final Long dateOfTimestampVerification,
       final boolean matchPartial, final boolean ignoreCase) {
     requireNonNull(dateOfTimestampVerification, "dateOfTimestampVerification must not be null");
     this.dateOfTimestampVerification = dateOfTimestampVerification;
@@ -65,7 +64,7 @@ public class Rfc4880KeySelectionStrategy implements KeySelectionStrategy {
    *
    * @return dateOfTimestampVerification
    */
-  protected Instant getDateOfTimestampVerification() {
+  protected Long getDateOfTimestampVerification() {
     return dateOfTimestampVerification;
   }
 
@@ -205,10 +204,8 @@ public class Rfc4880KeySelectionStrategy implements KeySelectionStrategy {
     final boolean isExpired;
 
     if (hasExpiryDate) {
-      final Instant expiryDate = pubKey.getCreationTime().toInstant()
-          .plusSeconds(pubKey.getValidSeconds());
-      isExpired = expiryDate
-          .isBefore(getDateOfTimestampVerification());
+      final Long expiryDate = pubKey.getCreationTime().getTime() + (pubKey.getValidSeconds() * 1000);
+      isExpired = expiryDate < getDateOfTimestampVerification();
 
       if (isExpired) {
         LOGGER.trace("Skipping pubkey {} (expired since {})",

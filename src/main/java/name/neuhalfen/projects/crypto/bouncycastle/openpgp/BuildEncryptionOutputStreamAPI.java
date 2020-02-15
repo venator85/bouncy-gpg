@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -243,7 +242,7 @@ public final class BuildEncryptionOutputStreamAPI {
     private static final boolean SELECT_UID_BY_E_MAIL_ONLY_DEFAULT = true;
 
     @Nullable
-    private Instant dateOfTimestampVerification;
+    private Long dateOfTimestampVerification;
 
     @Nullable
     @SuppressWarnings({"PMD.LinguisticNaming"})
@@ -284,7 +283,7 @@ public final class BuildEncryptionOutputStreamAPI {
     /**
      * In order to determine key validity a reference point in time for "now" is needed.
      * The default value is "Instant.now()". If this needs to be overridden, pass the value
-     * here. To effectively disable time based key verification pass Instant.MAX (NOT recommended)
+     * here. To effectively disable time based key verification pass Long.MAX_VALUE (NOT recommended)
      *
      * This is not possible in combination with #withKeySelectionStrategy.
      *
@@ -294,7 +293,7 @@ public final class BuildEncryptionOutputStreamAPI {
      */
     @SuppressWarnings("PMD.LinguisticNaming")
     public WithAlgorithmSuite setReferenceDateForKeyValidityTo(
-        final Instant dateOfTimestampVerification) {
+        final Long dateOfTimestampVerification) {
 
       Preconditions.checkState(keySelectionStrategy == null,
           "selectUidByAnyUidPart/setReferenceDateForKeyValidityTo cannot be"
@@ -345,7 +344,7 @@ public final class BuildEncryptionOutputStreamAPI {
           this.selectUidByEMailOnly = SELECT_UID_BY_E_MAIL_ONLY_DEFAULT;
         }
         if (this.dateOfTimestampVerification == null) {
-          this.dateOfTimestampVerification = Instant.now();
+          this.dateOfTimestampVerification = System.currentTimeMillis();
         }
 
         if (this.selectUidByEMailOnly) {

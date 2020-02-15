@@ -96,7 +96,7 @@ public class RFC4880TestKeyringsDedicatedSigningKeySanityTest {
     assertNotNull("Expired Signature key exists", publicKey);
 
     assertEquals("Expired key has correct creation date set", EXPIRED_KEY_CREATION_TIME,
-        publicKey.getCreationTime().toInstant());
+        publicKey.getCreationTime().getTime());
     assertEquals("Expired key has correct expiry time set", 86450, publicKey.getValidSeconds());
   }
 

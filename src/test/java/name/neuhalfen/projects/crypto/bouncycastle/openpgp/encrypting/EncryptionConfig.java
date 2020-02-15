@@ -2,7 +2,6 @@ package name.neuhalfen.projects.crypto.bouncycastle.openpgp.encrypting;
 
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.callbacks.KeySelectionStrategy;
@@ -27,7 +26,7 @@ public class EncryptionConfig {
   private final KeyringConfig keyringConfig;
 
   private final KeySelectionStrategy keySelectionStrategy = new Rfc4880KeySelectionStrategy(
-      Instant.MAX);
+      Long.MAX_VALUE);
 
   public EncryptionConfig(String signatureSecretKeyId,
       String encryptionPublicKeyId,

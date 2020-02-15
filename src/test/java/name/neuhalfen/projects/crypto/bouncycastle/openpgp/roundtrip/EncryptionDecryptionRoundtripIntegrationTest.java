@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
-import java.time.Instant;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.BouncyGPG;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.algorithms.DefaultPGPAlgorithmSuites;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.algorithms.PGPAlgorithmSuite;
@@ -330,7 +329,7 @@ public class EncryptionDecryptionRoundtripIntegrationTest {
     final OutputStream outputStream = BouncyGPG
         .encryptToStream()
         .withConfig(Configs.keyringConfigFromFilesForSender())
-        .setReferenceDateForKeyValidityTo(Instant.MAX)
+        .setReferenceDateForKeyValidityTo(Long.MAX_VALUE)
         .withAlgorithms(algorithmSuite)
         .toRecipient("recipient@example.com")
         .andSignWith("sender@example.com")
@@ -466,7 +465,7 @@ public class EncryptionDecryptionRoundtripIntegrationTest {
     final OutputStream outputStream = BouncyGPG
         .encryptToStream()
         .withConfig(Configs.keyringConfigFromResourceForSender())
-        .setReferenceDateForKeyValidityTo(Instant.MAX)
+        .setReferenceDateForKeyValidityTo(Long.MAX_VALUE)
         .withAlgorithms(algorithmSuite)
         .toRecipients("sender@example.com", "recipient@example.com")
         .andSignWith("sender@example.com")
@@ -504,7 +503,7 @@ public class EncryptionDecryptionRoundtripIntegrationTest {
         .encryptToStream()
         .withConfig(Configs.keyringConfigFromFilesForSender())
         .selectUidByAnyUidPart()
-        .setReferenceDateForKeyValidityTo(Instant.MAX)
+        .setReferenceDateForKeyValidityTo(Long.MAX_VALUE)
         .withAlgorithms(algorithmSuite)
         .toRecipient("<recipient@example.com>")
         .andSignWith(FULL_USER_ID_SENDER)

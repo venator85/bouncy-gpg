@@ -80,7 +80,7 @@ public class Issue34Test {
                 BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(result, 16384);
                 final OutputStream outputStream = BouncyGPG
                         .encryptToStream()
-                        .withConfig(keyring).withKeySelectionStrategy(new Rfc4880KeySelectionStrategy(Instant.parse("2020-01-21T09:00:00Z")){
+                        .withConfig(keyring).withKeySelectionStrategy(new Rfc4880KeySelectionStrategy(Instant.parse("2020-01-21T09:00:00Z").toEpochMilli()){
                             // The key does not have set any of KeyFlag.ENCRYPT_COMMS or the KeyFlag.ENCRYPT_STORAGE
                             protected boolean isEncryptionKey(PGPPublicKey publicKey){return true;}
                         })

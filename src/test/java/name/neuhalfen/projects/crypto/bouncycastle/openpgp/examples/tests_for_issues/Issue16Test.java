@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
-import java.time.Instant;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.BouncyGPG;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.callbacks.KeyringConfigCallbacks;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.callbacks.RFC4880TestKeyringsDedicatedSigningKey;
@@ -52,7 +51,7 @@ public class Issue16Test {
     encryptToStdout(config,
         recipient,
         signer,
-        Instant.now());
+        System.currentTimeMillis());
   }
 
 
@@ -75,12 +74,12 @@ public class Issue16Test {
     encryptToStdout(RFC4880TestKeyringsMasterKeyAsSigningKey.publicAndPrivateKeyKeyringConfig(),
         RFC4880TestKeyringsMasterKeyAsSigningKey.UID_EMAIL,
         RFC4880TestKeyringsMasterKeyAsSigningKey.UID_EMAIL,
-        Instant.MAX);
+        Long.MAX_VALUE);
   }
 
   void encryptToStdout(final KeyringConfig config, final String recipientUid,
       final String signingUid,
-      final Instant dateOfTimestampVerification)
+      final Long dateOfTimestampVerification)
       throws IOException, PGPException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
     final byte[] expectedPlaintext = ExampleMessages.IMPORTANT_QUOTE_TEXT.getBytes(
         "US-ASCII");
@@ -144,14 +143,14 @@ public class Issue16Test {
         RFC4880TestKeyringsMasterKeyAsSigningKey.publicAndPrivateKeyKeyringConfig(),
         RFC4880TestKeyringsMasterKeyAsSigningKey.UID_EMAIL,
         RFC4880TestKeyringsMasterKeyAsSigningKey.UID_EMAIL,
-        Instant.MAX,
+        Long.MAX_VALUE,
         RFC4880TestKeyringsMasterKeyAsSigningKey.MASTER_KEY_ID);
   }
 
 
   private void signAtDateAndValidateExpectedKey(final KeyringConfig config,
       final String recipientUid,
-      final String signingUid, final Instant dateOfTimestampVerification,
+      final String signingUid, final Long dateOfTimestampVerification,
       long expectedSignatureKey)
       throws IOException, PGPException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException {
     final byte[] expectedPlaintext = ExampleMessages.IMPORTANT_QUOTE_TEXT.getBytes(

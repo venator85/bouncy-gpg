@@ -9,7 +9,6 @@ import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.BouncyGPG;
@@ -45,11 +44,11 @@ public class RFC4880KeySelectionStrategyTest {
         ByEMailKeySelectionStrategy.class};
   }
 
-  Rfc4880KeySelectionStrategy buildSut(final Instant dateOfTimestampVerification) {
+  Rfc4880KeySelectionStrategy buildSut(final Long dateOfTimestampVerification) {
     assert strategyUnderTest != null;
     try {
       final Constructor<? extends Rfc4880KeySelectionStrategy> constructor = strategyUnderTest
-          .getConstructor(Instant.class);
+          .getConstructor(Long.class);
       return constructor.newInstance(dateOfTimestampVerification);
     } catch (Exception e) {
       throw new AssertionError(
@@ -287,7 +286,7 @@ public class RFC4880KeySelectionStrategyTest {
     final KeyringConfig keyringConfig = RFC4880TestKeyringsMasterKeyAsSigningKey
         .publicAndPrivateKeyKeyringConfig();
 
-    final KeySelectionStrategy keySelectionStrategy = buildSut(Instant.MAX);
+    final KeySelectionStrategy keySelectionStrategy = buildSut(Long.MAX_VALUE);
 
     final PGPPublicKey signingPublicKey = keySelectionStrategy
         .selectPublicKey(PURPOSE.FOR_SIGNING, RFC4880TestKeyringsMasterKeyAsSigningKey.UID_EMAIL,
