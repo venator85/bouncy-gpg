@@ -1,21 +1,14 @@
 package name.neuhalfen.projects.crypto.bouncycastle.openpgp.validation;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.callbacks.KeySelectionStrategy;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.keyrings.KeyringConfig;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+
+import java.io.IOException;
+import java.util.*;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Defines strategies for signature checking.
@@ -77,9 +70,11 @@ public final class SignatureValidationStrategies {
         throw new PGPException("Could not find public-key for userid '" + userId + "'");
       }
 
-      final Set<Long> keysForUid = availableKeys.stream().map(PGPPublicKey::getKeyID)
-          .collect(Collectors.toSet());
-
+      Set<Long> keysForUid = new HashSet<>();
+      for (PGPPublicKey it : availableKeys) {
+        Long out = it.getKeyID();
+        keysForUid.add(out);
+      }
       keyIdsByUid.put(userId, keysForUid);
     }
     return new RequireSpecificSignatureValidationForUserIdsStrategy(keyIdsByUid);

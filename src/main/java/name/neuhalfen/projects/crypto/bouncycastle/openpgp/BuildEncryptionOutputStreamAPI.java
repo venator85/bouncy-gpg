@@ -1,15 +1,5 @@
 package name.neuhalfen.projects.crypto.bouncycastle.openpgp;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.util.HashSet;
-import java.util.Set;
-import javax.annotation.Nullable;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.algorithms.DefaultPGPAlgorithmSuites;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.algorithms.PGPAlgorithmSuite;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.encrypting.PGPEncryptingStream;
@@ -25,6 +15,17 @@ import name.neuhalfen.projects.crypto.internal.Preconditions;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.util.HashSet;
+import java.util.Set;
+
+import static java.util.Objects.requireNonNull;
 
 
 @SuppressWarnings({"PMD.GodClass", "PMD.AtLeastOneConstructor",
@@ -328,7 +329,7 @@ public final class BuildEncryptionOutputStreamAPI {
 
       this.keySelectionStrategy = strategy;
       LOGGER.trace("WithKeySelectionStrategy: override strategy to {}",
-          strategy.getClass().toGenericString());
+          strategy.getClass().toString());
       return this;
     }
 

@@ -1,22 +1,28 @@
 package name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.callbacks;
 
-import static java.util.Objects.requireNonNull;
-import static name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.generation.KeyFlag.extractPublicKeyFlags;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-import javax.annotation.Nullable;
+import java9.util.Spliterators;
+import java9.util.function.BinaryOperator;
+import java9.util.function.Function;
+import java9.util.function.Predicate;
+import java9.util.stream.Collector;
+import java9.util.stream.Collectors;
+import java9.util.stream.Stream;
+import java9.util.stream.StreamSupport;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.generation.KeyFlag;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.keyrings.KeyringConfig;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import static java.util.Objects.requireNonNull;
+import static name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.generation.KeyFlag.extractPublicKeyFlags;
 
 /**
  * This implements the key selection strategy for BouncyGPG .
@@ -111,12 +117,22 @@ public class Rfc4880KeySelectionStrategy implements KeySelectionStrategy {
     final Set<PGPPublicKeyRing> publicKeyrings = this
         .publicKeyRingsForUid(PURPOSE.FOR_SIGNING, uid, keyringConfig);
 
-    return publicKeyrings.stream()
-        .flatMap(keyring -> StreamSupport.stream(keyring.spliterator(), false))
-        .filter(this::isVerificationKey)
-        .filter(this::isNotRevoked)
-        .filter(this::isNotExpired)
-        .collect(Collectors.toSet());
+    Stream<PGPPublicKey> stream = StreamSupport.stream(publicKeyrings)
+            .flatMap(new Function<PGPPublicKeyRing, Stream<PGPPublicKey>>() {
+              @Override
+              public Stream<PGPPublicKey> apply(PGPPublicKeyRing keyring) {
+                return StreamSupport.stream(Spliterators.spliteratorUnknownSize(keyring.iterator(), 0),
+                        false);
+              }
+            })
+            .filter(new Predicate<PGPPublicKey>() {
+              @Override
+              public boolean test(PGPPublicKey pubKey) {
+                return isVerificationKey(pubKey) && isNotRevoked(pubKey) && isNotExpired(pubKey);
+              }
+            });
+    Collector<PGPPublicKey, ?, Set<PGPPublicKey>> collector = Collectors.toSet();
+    return stream.collect(collector);
   }
 
   @Nullable
@@ -137,23 +153,49 @@ public class Rfc4880KeySelectionStrategy implements KeySelectionStrategy {
       case FOR_SIGNING:
         final PGPSecretKeyRingCollection secretKeyRings = keyringConfig.getSecretKeyRings();
 
-        return publicKeyrings.stream()
-            .flatMap(keyring -> StreamSupport.stream(keyring.spliterator(), false))
-            .filter(this::isVerificationKey)
-            .filter(this::isNotRevoked)
-            .filter(this::isNotExpired)
-            .filter(hasPrivateKey(secretKeyRings))
-            .reduce((a, b) -> b)
-            .orElse(null);
+        return StreamSupport.stream(publicKeyrings)
+                .flatMap(new Function<PGPPublicKeyRing, Stream<PGPPublicKey>>() {
+                  @Override
+                  public Stream<PGPPublicKey> apply(PGPPublicKeyRing keyring1) {
+                    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(keyring1.iterator(), 0),
+                            false);
+                  }
+                })
+                .filter(new Predicate<PGPPublicKey>() {
+                  @Override
+                  public boolean test(PGPPublicKey pubKey) {
+                    return isVerificationKey(pubKey) && isNotRevoked(pubKey) && isNotExpired(pubKey);
+                  }
+                })
+                .filter(hasPrivateKey(secretKeyRings))
+                .reduce(new BinaryOperator<PGPPublicKey>() {
+                  @Override
+                  public PGPPublicKey apply(PGPPublicKey a, PGPPublicKey b) {
+                    return b;
+                  }
+                }).orElse(null);
 
       case FOR_ENCRYPTION:
-        return publicKeyrings.stream()
-            .flatMap(keyring -> StreamSupport.stream(keyring.spliterator(), false))
-            .filter(this::isEncryptionKey)
-            .filter(this::isNotRevoked)
-            .filter(this::isNotExpired)
-            .reduce((a, b) -> b)
-            .orElse(null);
+        return StreamSupport.stream(publicKeyrings)
+                .flatMap(new Function<PGPPublicKeyRing, Stream<PGPPublicKey>>() {
+                  @Override
+                  public Stream<PGPPublicKey> apply(PGPPublicKeyRing keyring1) {
+                    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(keyring1.iterator(), 0),
+                            false);
+                  }
+                })
+                .filter(new Predicate<PGPPublicKey>() {
+                  @Override
+                  public boolean test(PGPPublicKey pubKey) {
+                    return isEncryptionKey(pubKey) && isNotRevoked(pubKey) && isNotExpired(pubKey);
+                  }
+                })
+                .reduce(new BinaryOperator<PGPPublicKey>() {
+                  @Override
+                  public PGPPublicKey apply(PGPPublicKey a, PGPPublicKey b) {
+                    return b;
+                  }
+                }).orElse(null);
 
       default:
         return null;
@@ -163,23 +205,26 @@ public class Rfc4880KeySelectionStrategy implements KeySelectionStrategy {
 
   @SuppressWarnings({"PMD.LinguisticNaming"})
   protected Predicate<PGPPublicKey> hasPrivateKey(final PGPSecretKeyRingCollection secretKeyRings) {
-    return pubKey -> {
-      requireNonNull(pubKey, "pubKey must not be null");
+    return new Predicate<PGPPublicKey>() {
+      @Override
+      public boolean test(PGPPublicKey pubKey) {
+        requireNonNull(pubKey, "pubKey must not be null");
 
-      try {
-        final boolean hasPrivateKey = secretKeyRings.contains(pubKey.getKeyID());
+        try {
+          final boolean hasPrivateKey = secretKeyRings.contains(pubKey.getKeyID());
 
-        if (!hasPrivateKey) {
-          LOGGER.trace("Skipping pubkey {} (no private key found)",
-              Long.toHexString(pubKey.getKeyID()));
+          if (!hasPrivateKey) {
+            LOGGER.trace("Skipping pubkey {} (no private key found)",
+                    Long.toHexString(pubKey.getKeyID()));
+          }
+
+          return hasPrivateKey;
+        } catch (PGPException e) {
+          // ignore this for filtering
+          LOGGER.debug("Failed to test for private key for pubkey " + pubKey//NOPMD:GuardLogStatement
+                  .getKeyID());
+          return false;
         }
-
-        return hasPrivateKey;
-      } catch (PGPException e) {
-        // ignore this for filtering
-        LOGGER.debug("Failed to test for private key for pubkey " + pubKey//NOPMD:GuardLogStatement
-            .getKeyID());
-        return false;
       }
     };
   }

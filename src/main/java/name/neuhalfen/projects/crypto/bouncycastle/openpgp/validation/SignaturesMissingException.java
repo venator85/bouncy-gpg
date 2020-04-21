@@ -1,12 +1,11 @@
 package name.neuhalfen.projects.crypto.bouncycastle.openpgp.validation;
 
+import javax.annotation.Nullable;
 import java.security.SignatureException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 public class SignaturesMissingException extends SignatureException {
 
@@ -94,9 +93,12 @@ public class SignaturesMissingException extends SignatureException {
     public static Set<MissingSignature> fromKeyIds(final Set<Long> keyIds) {
       Objects.requireNonNull(keyIds, "keyIds must not be null");
 
-      return keyIds.stream() // NOPMD: demeter
-          .map(SignaturesMissingException.MissingSignature::fromKeyId).collect(
-              Collectors.toSet());
+      Set<MissingSignature> set = new HashSet<>();
+      for (Long keyId : keyIds) {
+        MissingSignature missingSignature = fromKeyId(keyId);
+        set.add(missingSignature);
+      }
+      return set;
     }
 
     /**
@@ -121,9 +123,12 @@ public class SignaturesMissingException extends SignatureException {
     public static Set<MissingSignature> fromUids(final Set<String> uids) {
       Objects.requireNonNull(uids, "uids must not be null");
 
-      return uids.stream() // NOPMD: demeter
-          .map(SignaturesMissingException.MissingSignature::fromUid).collect(
-              Collectors.toSet());
+      Set<MissingSignature> set = new HashSet<>();
+      for (String uid : uids) {
+        MissingSignature missingSignature = fromUid(uid);
+        set.add(missingSignature);
+      }
+      return set;
     }
 
     @Nullable

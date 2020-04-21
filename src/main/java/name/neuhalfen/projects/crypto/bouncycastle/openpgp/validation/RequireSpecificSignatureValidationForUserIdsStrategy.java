@@ -1,21 +1,22 @@
 package name.neuhalfen.projects.crypto.bouncycastle.openpgp.validation;
 
 
-import static java.util.Objects.requireNonNull;
-import static name.neuhalfen.projects.crypto.bouncycastle.openpgp.validation.SignatureValidationHelper.knownKeysWithGoodSignatures;
+import name.neuhalfen.projects.crypto.bouncycastle.openpgp.validation.SignaturesMissingException.SetSemantics;
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPObjectFactory;
+import org.bouncycastle.openpgp.PGPOnePassSignature;
+import org.bouncycastle.openpgp.PGPSignatureList;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
-import name.neuhalfen.projects.crypto.bouncycastle.openpgp.validation.SignaturesMissingException.SetSemantics;
-import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPObjectFactory;
-import org.bouncycastle.openpgp.PGPOnePassSignature;
-import org.bouncycastle.openpgp.PGPSignatureList;
+
+import static java.util.Objects.requireNonNull;
+import static name.neuhalfen.projects.crypto.bouncycastle.openpgp.validation.SignatureValidationHelper.knownKeysWithGoodSignatures;
 
 final class RequireSpecificSignatureValidationForUserIdsStrategy implements
     SignatureValidationStrategy {
@@ -66,8 +67,9 @@ final class RequireSpecificSignatureValidationForUserIdsStrategy implements
         signatureList);
 
     // cross uid of the list
-    knownKeysWithGoodSignatures // NOPMD: demeter
-        .forEach(keyId -> signaturesRequired.remove(uidForKeyId(keyId)));
+    for (Long keyId : knownKeysWithGoodSignatures) {
+      signaturesRequired.remove(uidForKeyId(keyId));
+    }
 
     final boolean successfullyVerified = signaturesRequired.isEmpty();
 

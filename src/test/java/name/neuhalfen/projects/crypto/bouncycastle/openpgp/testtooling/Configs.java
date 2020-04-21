@@ -1,9 +1,6 @@
 package name.neuhalfen.projects.crypto.bouncycastle.openpgp.testtooling;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.encrypting.EncryptWithOpenPGPTestDriverTest;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.encrypting.EncryptionConfig;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.callbacks.KeyringConfigCallback;
@@ -11,8 +8,11 @@ import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.callbacks.Keyrin
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.keyrings.InMemoryKeyring;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.keyrings.KeyringConfig;
 import name.neuhalfen.projects.crypto.bouncycastle.openpgp.keys.keyrings.KeyringConfigs;
-import org.bouncycastle.crypto.tls.HashAlgorithm;
 import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.tls.HashAlgorithm;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Example configurations used in unit/-integration tests.

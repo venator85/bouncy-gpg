@@ -1,10 +1,10 @@
 package name.neuhalfen.projects.crypto.bouncycastle.openpgp.algorithms;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.bouncycastle.bcpg.HashAlgorithmTags;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -58,13 +58,26 @@ public enum PGPHashAlgorithms {
    */
   HAVAL_5_160(HashAlgorithmTags.HAVAL_5_160, true,true);
 
-  private final static Set<PGPHashAlgorithms> RECOMMENDED_ALGORITHMS = Collections
-      .unmodifiableSet(
-          Arrays.stream(
-              PGPHashAlgorithms.values()).filter(alg -> !alg.insecure && alg.supportedInGPG )
-              .collect(Collectors.toSet()));
-  private final static int[] RECOMMENDED_ALGORITHM_IDS =
-      RECOMMENDED_ALGORITHMS.stream().mapToInt(algorithm -> algorithm.algorithmId).toArray();
+  private final static Set<PGPHashAlgorithms> RECOMMENDED_ALGORITHMS;
+  static {
+    Set<PGPHashAlgorithms> set = new HashSet<>();
+    for (PGPHashAlgorithms alg : PGPHashAlgorithms.values()) {
+      if (!alg.insecure && alg.supportedInGPG) {
+        set.add(alg);
+      }
+    }
+    RECOMMENDED_ALGORITHMS = Collections.unmodifiableSet(set);
+  }
+
+  private final static int[] RECOMMENDED_ALGORITHM_IDS;
+  static {
+    RECOMMENDED_ALGORITHM_IDS = new int[RECOMMENDED_ALGORITHMS.size()];
+    int i = 0;
+    for (PGPHashAlgorithms alg : RECOMMENDED_ALGORITHMS) {
+      RECOMMENDED_ALGORITHM_IDS[i++] = alg.algorithmId;
+    }
+  }
+
   private final int algorithmId;
   private final boolean insecure;
   private final boolean supportedInGPG;

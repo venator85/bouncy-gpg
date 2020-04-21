@@ -263,7 +263,7 @@ public final class BuildSigningOutputStreamAPI {
 
             this.keySelectionStrategy = strategy;
             LOGGER.trace("WithKeySelectionStrategy: override strategy to {}",
-                    strategy.getClass().toGenericString());
+                    strategy.getClass().toString());
             return this;
         }
 

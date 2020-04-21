@@ -1,10 +1,10 @@
 package name.neuhalfen.projects.crypto.bouncycastle.openpgp.algorithms;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Typed enum to describe the symmetric encryption algorithms supported by GPG.
@@ -85,14 +85,26 @@ public enum PGPSymmetricEncryptionAlgorithms {
   CAMELLIA_256(SymmetricKeyAlgorithmTags.CAMELLIA_256, false);
 
 
-  private final static Set<PGPSymmetricEncryptionAlgorithms> RECOMMENDED_ALGORITHMS = Collections
-      .unmodifiableSet(
-          Arrays.stream(
-              PGPSymmetricEncryptionAlgorithms.values())
-              .filter(alg -> !alg.insecure)
-              .collect(Collectors.toSet()));
-  private final static int[] RECOMMENDED_ALGORITHM_IDS =
-      RECOMMENDED_ALGORITHMS.stream().mapToInt(algorithm -> algorithm.algorithmId).toArray();
+  private final static Set<PGPSymmetricEncryptionAlgorithms> RECOMMENDED_ALGORITHMS;
+  static {
+    Set<PGPSymmetricEncryptionAlgorithms> set = new HashSet<>();
+    for (PGPSymmetricEncryptionAlgorithms alg : PGPSymmetricEncryptionAlgorithms.values()) {
+      if (!alg.insecure) {
+        set.add(alg);
+      }
+    }
+    RECOMMENDED_ALGORITHMS = Collections.unmodifiableSet(set);
+  }
+
+  private final static int[] RECOMMENDED_ALGORITHM_IDS;
+  static {
+    RECOMMENDED_ALGORITHM_IDS = new int[RECOMMENDED_ALGORITHMS.size()];
+    int i = 0;
+    for (PGPSymmetricEncryptionAlgorithms alg : RECOMMENDED_ALGORITHMS) {
+      RECOMMENDED_ALGORITHM_IDS[i++] = alg.algorithmId;
+    }
+  }
+
   private final int algorithmId;
   private final boolean insecure;
 
